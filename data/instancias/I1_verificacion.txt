@@ -1,0 +1,55 @@
+Instancia: I1
+solución factible de referencia VERIFICADO (no es una solucion optima)
+Dificultad computacional: PENDIENTE de medir con el solver.
+Vehiculos originales: 25; nuevos: 3
+Capacidad original: 200; nueva: 98; margen: 5.0%
+Cierre original: 230; nuevo: 230
+Ventanas con limite superior ampliado: 2
+
+Cliente 8: DUE 115 -> 173
+Cliente 15: DUE 81 -> 179
+
+Asignacion solución factible de referencia ruta 1: [17, 5, 6, 16, 14, 13]
+Cargas: [93, 81, 38]
+
+Asignacion solución factible de referencia ruta 2: [15, 2, 4, 12, 3, 9, 1]
+Cargas: [76, 74, 58]
+
+Asignacion solución factible de referencia ruta 3: [20, 10, 11, 19, 7, 18, 8]
+Cargas: [61, 66, 78]
+
+Ruta 1, dia 1: 0 -> 6 -> 5 -> 17 -> 16 -> 14 -> 13 -> 0
+Salida fija: 0; retorno: 170.180340
+Inicio de servicio (valores mostrados redondeados): 6: 11.180340, 5: 31.180340, 17: 51.180340, 16: 72.360680, 14: 93.541020, 13: 149.000000
+
+Ruta 1, dia 2: 0 -> 6 -> 5 -> 16 -> 14 -> 13 -> 0
+Salida fija: 0; retorno: 170.180340
+Inicio de servicio (valores mostrados redondeados): 6: 11.180340, 5: 31.180340, 16: 52.360680, 14: 73.541020, 13: 149.000000
+
+Ruta 1, dia 3: 0 -> 6 -> 16 -> 14 -> 17 -> 0
+Salida fija: 0; retorno: 133.162929
+Inicio de servicio (valores mostrados redondeados): 6: 11.180340, 16: 39.208096, 14: 60.388436, 17: 92.749116
+
+Ruta 2, dia 1: 0 -> 12 -> 3 -> 1 -> 9 -> 2 -> 15 -> 0
+Salida fija: 0; retorno: 209.382489
+Inicio de servicio (valores mostrados redondeados): 12: 15.000000, 3: 36.180340, 1: 60.740560, 9: 88.545053, 2: 145.968676, 15: 168.968676
+
+Ruta 2, dia 2: 0 -> 12 -> 1 -> 9 -> 4 -> 15 -> 0
+Salida fija: 0; retorno: 218.568572
+Inicio de servicio (valores mostrados redondeados): 12: 15.000000, 1: 41.643317, 9: 87.000000, 4: 139.000000, 15: 178.154759
+
+Ruta 2, dia 3: 0 -> 12 -> 3 -> 2 -> 4 -> 0
+Salida fija: 0; retorno: 174.000000
+Inicio de servicio (valores mostrados redondeados): 12: 15.000000, 3: 36.180340, 2: 80.589641, 4: 139.000000
+
+Ruta 3, dia 1: 0 -> 10 -> 19 -> 11 -> 8 -> 20 -> 0
+Salida fija: 0; retorno: 194.695087
+Inicio de servicio (valores mostrados redondeados): 10: 25.495098, 19: 50.495098, 11: 67.566165, 8: 101.732257, 20: 153.072311
+
+Ruta 3, dia 2: 0 -> 18 -> 7 -> 19 -> 10 -> 20 -> 8 -> 0
+Salida fija: 0; retorno: 195.391979
+Inicio de servicio (valores mostrados redondeados): 18: 15.811388, 7: 35.811388, 19: 56.991728, 10: 81.991728, 20: 107.803116, 8: 159.143170
+
+Ruta 3, dia 3: 0 -> 18 -> 7 -> 19 -> 11 -> 10 -> 20 -> 8 -> 0
+Salida fija: 0; retorno: 208.643387
+Inicio de servicio (valores mostrados redondeados): 18: 15.811388, 7: 35.811388, 19: 56.991728, 11: 74.062796, 10: 95.243136, 20: 121.054524, 8: 172.394577
