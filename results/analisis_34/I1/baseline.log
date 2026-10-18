@@ -1,0 +1,13 @@
+
+Gurobi 13.0.3 (linux64) logging started Sun Oct 18 16:09:51 2026
+
+Set parameter LogFile to value "/workspace/scratch/a63dc808ee5a/T2opti/results/analisis_34/I1/baseline.log"
+Gurobi Optimizer version 13.0.3 build v13.0.3rc0 (linux64 - "Ubuntu 24.04.3 LTS")
+
+CPU model: AMD EPYC 9V74 80-Core Processor, instruction set [SSE2|AVX|AVX2|AVX512]
+Thread count: 9 physical cores, 9 logical processors, using up to 1 threads
+
+Non-default parameters:
+TimeLimit  600
+Threads  1
+

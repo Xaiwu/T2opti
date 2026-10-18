@@ -1,0 +1,20 @@
+{
+  "instancia": "I1",
+  "sha256_instancia": "49dcbff87ccde2f65374d3a1de8ac0ca5e1c698755f5bb16f45244012b9a9119",
+  "sha256_notebook": "b00ff4b033c17b923ebe1e8f2d219f9e6af4d93e0b61a3106688eba82c4cf451",
+  "gurobi": [
+    13,
+    0,
+    3
+  ],
+  "python": "3.12.14",
+  "plataforma": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "procesador": "x86_64",
+  "Threads": 1,
+  "TimeLimit": 600,
+  "TuneTimeLimit": 1800,
+  "mip_start": "Misma referencia para todas las corridas; no usar incumbentes anteriores",
+  "criterio_manual": "menor objetivo, luego gap, luego tiempo",
+  "estado": "error",
+  "error": "Model too large for size-limited license; visit https://gurobi.com/unrestricted for more information"
+}
