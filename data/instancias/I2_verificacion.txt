@@ -1,6 +1,6 @@
 Instancia: I2
 solución factible de referencia VERIFICADO (no es una solucion optima)
-Dificultad computacional: PENDIENTE de medir con el solver.
+Dificultad computacional: ver results/I2_configuraciones.csv
 Vehiculos originales: 25; nuevos: 3
 Capacidad original: 200; nueva: 154; margen: 5.0%
 Cierre original: 230; nuevo: 296
