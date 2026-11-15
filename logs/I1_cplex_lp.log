@@ -1,0 +1,19 @@
+Version identifier: 22.2.0.0 | 2026-05-04 | 5dff98e58
+CPXPARAM_Read_DataCheck                          1
+Tried aggregator 1 time.
+LP Presolve eliminated 186 rows and 21 columns.
+Reduced LP has 2594 rows, 2562 columns, and 11955 nonzeros.
+Presolve time = 0.00 sec. (3.71 ticks)
+Symmetry aggregator did 3392 additional substitutions.
+Initializing dual steep norms . . .
+
+Iteration log . . .
+Iteration:     1   Dual objective     =            14.560220
+Iteration:   109   Dual objective     =           585.047877
+
+Dual crossover.
+  Dual:  Fixing 89 variables.
+       88 DMoves:  Infeasibility  1.27897692e-12  Objective  5.85047877e+02
+        0 DMoves:  Infeasibility  4.60728645e-13  Objective  5.85047877e+02
+  Dual:  Pushed 7, exchanged 82.
+  Primal:  Fixed no variables.

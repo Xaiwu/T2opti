@@ -1,0 +1,16 @@
+=== I1: 20 clientes, 3 dias, 3 rutas, 48 pedidos, limite=600s ===
+[I1] LP: Gurobi=585.047877 CPLEX=585.047877 dif.rel=5.83e-16 OK
+[I1] MIP: Gurobi=870.554122 (TIME_LIMIT) CPLEX=876.545833 (TIME_LIMIT) dif.rel=6.88e-03 
+=== I2: 30 clientes, 3 dias, 3 rutas, 76 pedidos, limite=600s ===
+[I2] LP: Gurobi=798.104362 CPLEX=798.104362 dif.rel=9.97e-16 OK
+[I2] MIP: Gurobi=1357.801564 (TIME_LIMIT) CPLEX=1352.909801 (TIME_LIMIT) dif.rel=3.60e-03 
+
+instancia solver modelo  objetivo      cota   gap_%  tiempo_s     nodos     estado valida
+       I1 Gurobi     LP  585.0479  585.0479     NaN    0.0253       0.0     OPTIMO      -
+       I1 Gurobi    MIP  870.5541  853.0273  2.0133  600.0218 1395177.0 TIME_LIMIT     OK
+       I1  CPLEX     LP  585.0479  585.0479     NaN    0.0110       0.0     OPTIMO      -
+       I1  CPLEX    MIP  876.5458  749.4317 14.5017  600.9225  605213.0 TIME_LIMIT     OK
+       I2 Gurobi     LP  798.1044  798.1044     NaN    0.0536       0.0     OPTIMO      -
+       I2 Gurobi    MIP 1357.8016 1069.6382 21.2228  600.0162  181538.0 TIME_LIMIT     OK
+       I2  CPLEX     LP  798.1044  798.1044     NaN    0.0216       0.0     OPTIMO      -
+       I2  CPLEX    MIP 1352.9098 1005.4249 25.6843  600.0238  341973.0 TIME_LIMIT     OK
