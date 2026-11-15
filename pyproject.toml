@@ -1,0 +1,21 @@
+[project]
+name = "t2opti"
+version = "1.0.0"
+description = "Add your description here"
+readme = "README.md"
+authors = []
+requires-python = ">=3.12"
+dependencies = [
+    "cplex>=22.2.0.1",
+    "docplex>=2.32.264",
+    "gurobipy==13.0.3",
+    "pandas>=3.1.1",
+    "setuptools>=84.2.1",
+]
+
+[project.scripts]
+main = "t2opti:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
