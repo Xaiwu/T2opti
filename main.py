@@ -4,20 +4,16 @@ Resuelve las instancias de data/instancias/ con el mismo modelo en Gurobi y en
 CPLEX (docplex), con parametros por defecto (solo TimeLimit), compara
 relajacion continua y modelo entero, y guarda logs de ambos solvers.
 
-Uso:  python tc3.py [--limite 600] [--instancias I1 I2] [--sin-start] [--regenerar]
+Uso:  uv run main.py [--limite 600] [--instancias I1 I2] [--sin-start] [--regenerar]
 Requiere gurobipy con licencia academica y cplex/docplex con la edicion completa
 (docplex config --upgrade <carpeta de CPLEX Studio>).
 """
 import argparse
 import math
 import random
-import re
-import time
 from pathlib import Path
 
 import pandas as pd
-import gurobipy as gp
-from gurobipy import GRB
 from docplex.mp.model import Model
 
 PATH_SOLOMON = Path("data/originales")
@@ -31,11 +27,11 @@ INSTANCIAS_CFG = {
     "I2": dict(source="R110.txt", n=30, days=3, vehicles=3, seed=43, slack=0.05),
 }
 
-instancias = {}   # se llena en main()
+instancias = {}  # se llena en main()
 
 
 # ======================================================================
-# 1. Lectura y generacion de instancias (sin cambios respecto de TC2)
+# 1. Lectura y generacion de instancias
 # ======================================================================
 def leer_solomon(path):
     """Lee cabecera VEHICLE y filas CUSTOMER, sin depender de espacios exactos."""
@@ -74,7 +70,7 @@ def leer_solomon(path):
 def distancia(rows, i, j):
     return math.hypot(
         rows[i][1] - rows[j][1],
-        rows[i][2] - rows[j][2]
+        rows[i][2] - rows[j][2],
     )
 
 
@@ -102,8 +98,8 @@ def generar(source, destination, n, days, vehicles, seed, slack):
     ordered = sorted(
         ids, key=lambda i: math.atan2(
             rows[i][2] - rows[0][2],
-            rows[i][1] - rows[0][1]
-        )
+            rows[i][1] - rows[0][1],
+        ),
     )
 
     # Equilibrio de numero de clientes
@@ -137,11 +133,12 @@ def generar(source, destination, n, days, vehicles, seed, slack):
             previous, clock, visits = 0, opening, []
             while remaining:
                 # Escoge el siguiente cliente que podria empezar antes.
-                # inicio posible = max{apertura del cliente, hora actual + tiempo de viaje}, si hay empate el identificador mas bajo gana.
+                # inicio posible = max{apertura del cliente, hora actual + tiempo de viaje}, si hay empate el
+                # identificador mas bajo gana.
                 i = min(
                     remaining, key=lambda j: (
-                        max(ready[j], clock + distancia(rows, previous, j)), j
-                    )
+                        max(ready[j], clock + distancia(rows, previous, j)), j,
+                    ),
                 )
                 # Calcula el inicio de servicio y actualiza la ventana de cierre si es necesario.
                 start = max(ready[i], clock + distancia(rows, previous, i))
@@ -193,12 +190,12 @@ def generar(source, destination, n, days, vehicles, seed, slack):
         "TRAVEL_TIME EQUAL_DISTANCE", "TIME_UNIT ABSTRACT",
         "", "DEPOT", "ID X Y OPEN CLOSE",
         f"0 {rows[0][1]:g} {rows[0][2]:g} {opening:g} {closing:g}",
-        "", "CUSTOMERS", "ID X Y READY DUE SERVICE"
+        "", "CUSTOMERS", "ID X Y READY DUE SERVICE",
     ]
     for i in ids:
         text.append(
             f"{i} {rows[i][1]:g} {rows[i][2]:g} "
-            f"{ready[i]:g} {due[i]:g} {service[i]:g}"
+            f"{ready[i]:g} {due[i]:g} {service[i]:g}",
         )
     text += ["", "DAILY_DEMAND", "ID " + " ".join(f"DAY{t + 1}" for t in range(days))]
     text += [f"{i} " + " ".join(map(str, demand[i])) for i in ids]
@@ -212,7 +209,7 @@ def generar(source, destination, n, days, vehicles, seed, slack):
         f"Vehiculos originales: {original_vehicles}; nuevos: {vehicles}",
         f"Capacidad original: {original_q:g}; nueva: {q}; margen: {slack:.1%}",
         f"Cierre original: {original_close:g}; nuevo: {closing:g}",
-        f"Ventanas con limite superior ampliado: {len(widened)}", ""
+        f"Ventanas con limite superior ampliado: {len(widened)}", "",
     ]
     for i in widened:
         report.append(f"Cliente {i}: DUE {rows[i][5]:g} -> {due[i]:g}")
@@ -224,14 +221,14 @@ def generar(source, destination, n, days, vehicles, seed, slack):
         report += [
             f"\nRuta {r}, dia {t + 1}: {route}",
             f"Salida fija: {opening:g}; retorno: {return_time:.6f}",
-            f"Inicio de servicio (valores mostrados redondeados): {starts}"
+            f"Inicio de servicio (valores mostrados redondeados): {starts}",
         ]
     destination.with_name(name + "_verificacion.txt").write_text(
-        "\n".join(report) + "\n", encoding="utf-8"
+        "\n".join(report) + "\n", encoding="utf-8",
     )
     print(
         f"{destination.name}: {n} clientes, {days} dias, {vehicles} vehiculos, "
-        f"Q={q}, cierre={closing:g}, ventanas ampliadas={len(widened)}; solución factible de referencia OK"
+        f"Q={q}, cierre={closing:g}, ventanas ampliadas={len(widened)}; solución factible de referencia OK",
     )
 
 
@@ -247,7 +244,7 @@ def leer_multidia(path):
     seccion = None
 
     for numero_linea, linea in enumerate(
-        path.read_text(encoding="utf-8-sig").splitlines(), start=1
+        path.read_text(encoding="utf-8-sig").splitlines(), start=1,
     ):
         linea = linea.strip()
 
@@ -316,7 +313,7 @@ def leer_multidia(path):
 
         except ValueError as error:
             raise ValueError(
-                f"{path.name}, línea {numero_linea}: {error}"
+                f"{path.name}, línea {numero_linea}: {error}",
             ) from error
 
     # Comprobaciones de estructura.
@@ -385,7 +382,7 @@ def leer_multidia(path):
     coordenadas.update(
         {
             i: (clientes[i]["x"], clientes[i]["y"]) for i in C
-        }
+        },
     )
 
     td = {
@@ -427,7 +424,7 @@ def leer_multidia(path):
             (i, j, t)
                 for i in activos
                 for j in activos
-                if i != j
+                if i != j,
         )
 
     return {
@@ -454,7 +451,7 @@ def leer_multidia(path):
 
 
 # ======================================================================
-# 3. Modelo en Gurobi, MIP start y validador (sin cambios respecto de TC2)
+# 3. Modelo en Gurobi, MIP start y validador
 # ======================================================================
 # ============================================================
 # Seccion 4.1: construccion del modelo MIP con Gurobi
@@ -495,7 +492,7 @@ def construir_modelo(instancia, verbo=False):
     # --- (1) Objetivo: distancia total ---
     m.setObjective(
         gp.quicksum(td[i, j] * x[i, j, t, r] for (i, j, t) in A for r in R),
-        GRB.MINIMIZE
+        GRB.MINIMIZE,
     )
 
     entra, sale = {}, {}
@@ -512,11 +509,11 @@ def construir_modelo(instancia, verbo=False):
         for r in R:
             m.addConstr(
                 gp.quicksum(x[k, i, t, r] for k in entra[i, t]) == z[i, r],
-                name=f"entrada_{i}_d{t}_r{r}"
+                name=f"entrada_{i}_d{t}_r{r}",
             )
             m.addConstr(
                 gp.quicksum(x[i, k, t, r] for k in sale[i, t]) == z[i, r],
-                name=f"salida_{i}_d{t}_r{r}"
+                name=f"salida_{i}_d{t}_r{r}",
             )
 
     # --- (5) Una salida del deposito por ruta y dia ---
@@ -524,7 +521,7 @@ def construir_modelo(instancia, verbo=False):
         for r in R:
             m.addConstr(
                 gp.quicksum(x[0, j, t, r] for j in sale[0, t]) == 1,
-                name=f"deposito_d{t}_r{r}"
+                name=f"deposito_d{t}_r{r}",
             )
 
     # --- (7), (9), (10) Coordinacion temporal con Big-M por arco ---
@@ -536,7 +533,7 @@ def construir_modelo(instancia, verbo=False):
             for r in R:
                 m.addConstr(
                     dW[r] + tt[0, j] <= s[j, t] + M * (1 - x[0, j, t, r]),
-                    name=f"sal_dep_{j}_d{t}_r{r}"
+                    name=f"sal_dep_{j}_d{t}_r{r}",
                 )
         elif j == ret:  # (10) ultimo cliente -> retorno
             M = up[i] + st[i, t] + tt[i, ret] - aW
@@ -544,7 +541,7 @@ def construir_modelo(instancia, verbo=False):
                 m.addConstr(
                     s[i, t] + st[i, t] + tt[i, ret]
                     <= rW[t, r] + M * (1 - x[i, ret, t, r]),
-                    name=f"ret_dep_{i}_d{t}_r{r}"
+                    name=f"ret_dep_{i}_d{t}_r{r}",
                 )
         else:  # (7) cliente -> cliente
             M = up[i] + st[i, t] + tt[i, j] - lo[j]
@@ -552,7 +549,7 @@ def construir_modelo(instancia, verbo=False):
                 m.addConstr(
                     s[i, t] + st[i, t] + tt[i, j]
                     <= s[j, t] + M * (1 - x[i, j, t, r]),
-                    name=f"sec_{i}_{j}_d{t}_r{r}"
+                    name=f"sec_{i}_{j}_d{t}_r{r}",
                 )
 
     # --- (14) Capacidad por ruta y dia (Q solo aparece como RHS) ---
@@ -560,7 +557,7 @@ def construir_modelo(instancia, verbo=False):
         for r in R:
             m.addConstr(
                 gp.quicksum(q[i, t] * z[i, r] for i in C if q[i, t] > 0) <= Q,
-                name=f"cap_d{t}_r{r}"
+                name=f"cap_d{t}_r{r}",
             )
 
     return m, {"x": x, "z": z, "s": s, "dW": dW, "rW": rW}
@@ -680,14 +677,14 @@ def validar_solucion(instancia, vars_):
 
     dist = sum(
         instancia["td"][i, j] * x[i, j, t, r].X
-            for (i, j, t) in instancia["A"] for r in R
+            for (i, j, t) in instancia["A"] for r in R,
     )
     return rutas, dist
 
 
 ESTADOS = {
     GRB.OPTIMAL: "OPTIMO", GRB.TIME_LIMIT: "TIME_LIMIT",
-    GRB.INFEASIBLE: "INFACTIBLE", GRB.INTERRUPTED: "INTERRUMPIDO"
+    GRB.INFEASIBLE: "INFACTIBLE", GRB.INTERRUPTED: "INTERRUMPIDO",
 }
 
 
@@ -696,7 +693,6 @@ def cargar_start(nombre, vars_):
     if archivo.is_file():
         rutas_ref, _ = solucion_de_verificacion(archivo)
         aplicar_inicio(vars_, instancias[nombre], rutas_ref)
-
 
 
 # ======================================================================
@@ -731,19 +727,25 @@ def construir_modelo_cplex(instancia, relajado=False):
         sale.setdefault((i, t), []).append(j)
         entra.setdefault((j, t), []).append(i)
 
-    for i in C:                                                    # (2)
+    for i in C:  # (2)
         m.add_constraint(m.sum(z[i, r] for r in R) == 1, ctname=f"asig_{i}")
-    for (i, t) in O:                                               # (3), (4)
+    for (i, t) in O:  # (3), (4)
         for r in R:
-            m.add_constraint(m.sum(x[k, i, t, r] for k in entra[i, t]) == z[i, r],
-                             ctname=f"entrada_{i}_d{t}_r{r}")
-            m.add_constraint(m.sum(x[i, k, t, r] for k in sale[i, t]) == z[i, r],
-                             ctname=f"salida_{i}_d{t}_r{r}")
-    for t in D:                                                    # (5)
+            m.add_constraint(
+                m.sum(x[k, i, t, r] for k in entra[i, t]) == z[i, r],
+                ctname=f"entrada_{i}_d{t}_r{r}",
+            )
+            m.add_constraint(
+                m.sum(x[i, k, t, r] for k in sale[i, t]) == z[i, r],
+                ctname=f"salida_{i}_d{t}_r{r}",
+            )
+    for t in D:  # (5)
         for r in R:
-            m.add_constraint(m.sum(x[0, j, t, r] for j in sale[0, t]) == 1,
-                             ctname=f"deposito_d{t}_r{r}")
-    for (i, j, t) in A:                                            # (7), (9), (10)
+            m.add_constraint(
+                m.sum(x[0, j, t, r] for j in sale[0, t]) == 1,
+                ctname=f"deposito_d{t}_r{r}",
+            )
+    for (i, j, t) in A:  # (7), (9), (10)
         if i == 0 and j == ret:
             continue
         for r in R:
@@ -752,16 +754,22 @@ def construir_modelo_cplex(instancia, relajado=False):
                 m.add_constraint(dW[r] + tt[0, j] <= s[j, t] + M * (1 - x[0, j, t, r]))
             elif j == ret:
                 M = up[i] + st[i, t] + tt[i, ret] - aW
-                m.add_constraint(s[i, t] + st[i, t] + tt[i, ret]
-                                 <= rW[t, r] + M * (1 - x[i, ret, t, r]))
+                m.add_constraint(
+                    s[i, t] + st[i, t] + tt[i, ret]
+                    <= rW[t, r] + M * (1 - x[i, ret, t, r]),
+                )
             else:
                 M = up[i] + st[i, t] + tt[i, j] - lo[j]
-                m.add_constraint(s[i, t] + st[i, t] + tt[i, j]
-                                 <= s[j, t] + M * (1 - x[i, j, t, r]))
-    for t in D:                                                    # (14)
+                m.add_constraint(
+                    s[i, t] + st[i, t] + tt[i, j]
+                    <= s[j, t] + M * (1 - x[i, j, t, r]),
+                )
+    for t in D:  # (14)
         for r in R:
-            m.add_constraint(m.sum(q[i, t] * z[i, r] for i in C if q[i, t] > 0) <= Q,
-                             ctname=f"cap_d{t}_r{r}")
+            m.add_constraint(
+                m.sum(q[i, t] * z[i, r] for i in C if q[i, t] > 0) <= Q,
+                ctname=f"cap_d{t}_r{r}",
+            )
     return m, {"x": x, "z": z, "s": s, "dW": dW, "rW": rW}
 
 
@@ -822,16 +830,20 @@ def resolver_gurobi(nombre, limite=600, usar_start=True):
     lp.Params.OutputFlag, lp.Params.LogToConsole, lp.Params.LogFile = 1, 0, str(lg_lp)
     lp.optimize()
     assert lp.Status == GRB.OPTIMAL, "relajacion de Gurobi no optima"
-    out["LP"] = dict(objetivo=lp.ObjVal, cota=lp.ObjVal, tiempo=lp.Runtime, nodos=0,
-                     estado="OPTIMO", valida="-")
+    out["LP"] = dict(
+        objetivo=lp.ObjVal, cota=lp.ObjVal, tiempo=lp.Runtime, nodos=0,
+        estado="OPTIMO", valida="-",
+    )
 
     m.Params.OutputFlag, m.Params.LogToConsole, m.Params.LogFile = 1, 0, str(lg_mip)
     m.Params.TimeLimit = limite
     if usar_start:
         cargar_start(nombre, v)
     m.optimize()
-    res = dict(objetivo=None, cota=None, tiempo=m.Runtime, nodos=m.NodeCount,
-               estado=ESTADOS.get(m.Status, str(m.Status)), valida="-")
+    res = dict(
+        objetivo=None, cota=None, tiempo=m.Runtime, nodos=m.NodeCount,
+        estado=ESTADOS.get(m.Status, str(m.Status)), valida="-",
+    )
     if m.SolCount > 0:
         res["objetivo"], res["cota"] = m.ObjVal, m.ObjBound
         try:
@@ -851,8 +863,10 @@ def resolver_cplex(nombre, limite=600, usar_start=True):
     with open(PATH_LOGS / f"{nombre}_cplex_lp.log", "w", encoding="utf-8") as fh:
         sol = m.solve(log_output=fh)
     assert sol is not None, f"relajacion de CPLEX sin solucion: {m.solve_details.status}"
-    out["LP"] = dict(objetivo=sol.objective_value, cota=sol.objective_value,
-                     tiempo=m.solve_details.time, nodos=0, estado="OPTIMO", valida="-")
+    out["LP"] = dict(
+        objetivo=sol.objective_value, cota=sol.objective_value,
+        tiempo=m.solve_details.time, nodos=0, estado="OPTIMO", valida="-",
+    )
 
     m, v = construir_modelo_cplex(inst)
     m.parameters.timelimit = limite
@@ -863,9 +877,11 @@ def resolver_cplex(nombre, limite=600, usar_start=True):
     det = m.solve_details
     txt = str(det.status).lower()
     estado = ("OPTIMO" if "optimal" in txt else "TIME_LIMIT" if "time limit" in txt
-              else "INFACTIBLE" if "infeasible" in txt else str(det.status))
-    res = dict(objetivo=None, cota=None, tiempo=det.time, nodos=det.nb_nodes_processed,
-               estado=estado, valida="-")
+    else "INFACTIBLE" if "infeasible" in txt else str(det.status))
+    res = dict(
+        objetivo=None, cota=None, tiempo=det.time, nodos=det.nb_nodes_processed,
+        estado=estado, valida="-",
+    )
     if sol is not None:
         res["objetivo"], res["cota"] = sol.objective_value, det.best_bound
         try:
@@ -902,36 +918,50 @@ def main():
         cfg = INSTANCIAS_CFG[nombre]
         archivo = PATH_GENERADAS / f"{nombre}.txt"
         if args.regenerar or not archivo.is_file():
-            generar(PATH_SOLOMON / cfg["source"], archivo, cfg["n"], cfg["days"],
-                    cfg["vehicles"], cfg["seed"], cfg["slack"])
+            generar(
+                PATH_SOLOMON / cfg["source"], archivo, cfg["n"], cfg["days"],
+                cfg["vehicles"], cfg["seed"], cfg["slack"],
+            )
         instancias[nombre] = leer_multidia(archivo)
         inst = instancias[nombre]
-        log(f"=== {nombre}: {len(inst['C'])} clientes, {len(inst['D'])} dias, "
-            f"{len(inst['R'])} rutas, {len(inst['O'])} pedidos, limite={args.limite:g}s ===")
+        log(
+            f"=== {nombre}: {len(inst['C'])} clientes, {len(inst['D'])} dias, "
+            f"{len(inst['R'])} rutas, {len(inst['O'])} pedidos, limite={args.limite:g}s ===",
+        )
 
-        res = {"Gurobi": resolver_gurobi(nombre, args.limite, not args.sin_start),
-               "CPLEX": resolver_cplex(nombre, args.limite, not args.sin_start)}
+        res = {
+            "Gurobi": resolver_gurobi(nombre, args.limite, not args.sin_start),
+            "CPLEX": resolver_cplex(nombre, args.limite, not args.sin_start),
+        }
         for solver, r in res.items():
             for tipo in ("LP", "MIP"):
                 d = r[tipo]
-                filas.append({"instancia": nombre, "solver": solver, "modelo": tipo,
-                              "objetivo": d["objetivo"], "cota": d["cota"],
-                              "gap_%": _gap(d["objetivo"], d["cota"]) if tipo == "MIP" else None,
-                              "tiempo_s": d["tiempo"], "nodos": d["nodos"],
-                              "estado": d["estado"], "valida": d["valida"]})
+                filas.append(
+                    {
+                        "instancia": nombre, "solver": solver, "modelo": tipo,
+                        "objetivo": d["objetivo"], "cota": d["cota"],
+                        "gap_%": _gap(d["objetivo"], d["cota"]) if tipo == "MIP" else None,
+                        "tiempo_s": d["tiempo"], "nodos": d["nodos"],
+                        "estado": d["estado"], "valida": d["valida"],
+                    },
+                )
 
         # Validacion cruzada
         lg, lc = res["Gurobi"]["LP"]["objetivo"], res["CPLEX"]["LP"]["objetivo"]
         rel = abs(lg - lc) / max(abs(lg), 1e-10)
-        log(f"[{nombre}] LP: Gurobi={lg:.6f} CPLEX={lc:.6f} dif.rel={rel:.2e} "
-            + ("OK" if rel < 1e-6 else "<<< DIFERENCIA NOTORIA"))
+        log(
+            f"[{nombre}] LP: Gurobi={lg:.6f} CPLEX={lc:.6f} dif.rel={rel:.2e} "
+            + ("OK" if rel < 1e-6 else "<<< DIFERENCIA NOTORIA"),
+        )
         mg, mc = res["Gurobi"]["MIP"], res["CPLEX"]["MIP"]
         if mg["objetivo"] is not None and mc["objetivo"] is not None:
             rel = abs(mg["objetivo"] - mc["objetivo"]) / max(abs(mg["objetivo"]), 1e-10)
             ambos = mg["estado"] == "OPTIMO" and mc["estado"] == "OPTIMO"
-            log(f"[{nombre}] MIP: Gurobi={mg['objetivo']:.6f} ({mg['estado']}) "
+            log(
+                f"[{nombre}] MIP: Gurobi={mg['objetivo']:.6f} ({mg['estado']}) "
                 f"CPLEX={mc['objetivo']:.6f} ({mc['estado']}) dif.rel={rel:.2e} "
-                + ("<<< DIFERENCIA NOTORIA" if ambos and rel > 2e-4 else ""))
+                + ("<<< DIFERENCIA NOTORIA" if ambos and rel > 2e-4 else ""),
+            )
             for a, b, na, nb in ((mg, mc, "Gurobi", "CPLEX"), (mc, mg, "CPLEX", "Gurobi")):
                 if a["objetivo"] < b["cota"] - 1e-4 * max(1, abs(b["cota"])):
                     log(f"[{nombre}] <<< incumbente de {na} menor que la cota de {nb}")
