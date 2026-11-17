@@ -424,7 +424,7 @@ def leer_multidia(path):
             (i, j, t)
                 for i in activos
                 for j in activos
-                if i != j,
+                if i != j
         )
 
     return {
@@ -677,7 +677,7 @@ def validar_solucion(instancia, vars_):
 
     dist = sum(
         instancia["td"][i, j] * x[i, j, t, r].X
-            for (i, j, t) in instancia["A"] for r in R,
+            for (i, j, t) in instancia["A"] for r in R
     )
     return rutas, dist
 
